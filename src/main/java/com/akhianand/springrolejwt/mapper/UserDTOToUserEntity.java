@@ -16,6 +16,7 @@ public class UserDTOToUserEntity implements Converter<UserDto, UserEntity> {
                 .password(source.getPassword())
                 .businessTitle(source.getBusinessTitle())
                 .phone(source.getPhone())
+                .birthdate(source.getBirthdate())
                 .name(source.getName())
                 .build();
     }

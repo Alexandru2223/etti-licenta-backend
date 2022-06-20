@@ -41,6 +41,9 @@ public class UserEntity {
     @Column(name = "businessTitle")
     private String businessTitle;
 
+    @Column(name = "birthdate")
+    private String birthdate;
+
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(name = "USER_ROLES",
             joinColumns = {
