@@ -19,4 +19,7 @@ public interface JobsRepository extends JpaRepository<JobsEntity, Long> {
 
     @Query("SELECT j FROM JobsEntity j inner join j.userEntity u where u.username =:user")
     List<JobsEntity> getJobsByUser(@Param("user") String user);
+
+    @Query("SELECT count(j) from JobsEntity j")
+    long getCountJobs();
 }

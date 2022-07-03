@@ -26,6 +26,6 @@ public class UserDto {
     private String name;
     private String businessTitle;
     private String birthdate;
-
+    private String avatar;
 
 }

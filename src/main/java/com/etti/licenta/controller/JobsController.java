@@ -4,11 +4,14 @@ import com.akhianand.springrolejwt.mapper.JobsEntityToJobsDTO;
 import com.akhianand.springrolejwt.model.UserEntity;
 import com.akhianand.springrolejwt.model.dto.JobsDTO;
 import com.akhianand.springrolejwt.model.dto.JobsSaveDto;
+import com.akhianand.springrolejwt.model.entity.CountJobsEntity;
 import com.akhianand.springrolejwt.model.entity.JobsEntity;
 import com.akhianand.springrolejwt.model.entity.JobsSaveEntity;
+import com.akhianand.springrolejwt.repository.CountJobsRepository;
 import com.akhianand.springrolejwt.repository.JobsRepository;
 import com.akhianand.springrolejwt.repository.JobsSaveRepository;
 import com.akhianand.springrolejwt.repository.UserRepository;
+import com.akhianand.springrolejwt.service.CountJobsService;
 import com.akhianand.springrolejwt.service.JobService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -27,6 +30,8 @@ public class JobsController {
 
     private final JobsEntityToJobsDTO jobsEntityToJobsDTO;
 
+    private final CountJobsService countJobsService;
+
     private final JobService service;
 
     private final UserRepository userRepository;
@@ -40,6 +45,13 @@ public class JobsController {
         return jobsRepository.getAllJobs().stream()
                 .map(jobsEntityToJobsDTO::convert)
                 .collect(Collectors.toList());
+    }
+
+    @PreAuthorize("hasRole('USER')")
+    @GetMapping({"/jobs/count"})
+    @ResponseStatus(HttpStatus.OK)
+    public List<CountJobsEntity> getLastWeekCount(){
+        return countJobsService.getLastWeek();
     }
 
     @PreAuthorize("hasRole('USER')")
@@ -74,9 +86,11 @@ public class JobsController {
 
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping({"/jobs/id/{id}"})
     @ResponseStatus(HttpStatus.OK)
     public JobsDTO getJobById(@PathVariable Long id) {
+        System.out.println(id);
         return jobsEntityToJobsDTO.convert(jobsRepository.findById(id).get());
     }
 
@@ -128,6 +142,13 @@ public class JobsController {
         return getJobsByUser(user);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping({"/jobs/delete/{id}"})
+    @ResponseStatus(HttpStatus.OK)
+    public void deleteJobByAdmin(@PathVariable long id) {
+        jobsRepository.deleteById(id);
+    }
+
     @PreAuthorize("hasRole('USER')")
     @PutMapping({"/jobs/update/{user}/{id}"})
     @ResponseStatus(HttpStatus.OK)
@@ -142,6 +163,7 @@ public class JobsController {
             jobsRepository.save(jobs);
         }
     }
+
 
 
 }

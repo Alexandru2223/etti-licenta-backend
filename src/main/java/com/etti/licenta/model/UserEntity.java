@@ -44,6 +44,9 @@ public class UserEntity {
     @Column(name = "birthdate")
     private String birthdate;
 
+    @Column(name = "avatar")
+    private String avatar;
+
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(name = "USER_ROLES",
             joinColumns = {
@@ -58,6 +61,5 @@ public class UserEntity {
 
     @OneToMany(mappedBy="userEntity")
     private List<ReviewsEntity> reviewsEntities;
-
 
 }

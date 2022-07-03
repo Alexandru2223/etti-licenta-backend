@@ -18,42 +18,42 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-public class JwtAuthenticationFilter extends OncePerRequestFilter {
+public class JwtAuthFilter extends OncePerRequestFilter {
 
     @Value("${jwt.header.string}")
-    public String HEADER_STRING;
+    public String HEADER;
 
     @Value("${jwt.token.prefix}")
-    public String TOKEN_PREFIX;
+    public String PREFIX;
 
     @Resource(name = "userService")
-    private UserDetailsService userDetailsService;
+    private UserDetailsService service;
 
     @Autowired
     private TokenProvider jwtTokenUtil;
 
     @Override
     protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain chain) throws IOException, ServletException {
-        String header = req.getHeader(HEADER_STRING);
+        String header = req.getHeader(HEADER);
         String username = null;
         String authToken = null;
-        if (header != null && header.startsWith(TOKEN_PREFIX)) {
-            authToken = header.replace(TOKEN_PREFIX,"");
+        if (header != null && header.startsWith(PREFIX)) {
+            authToken = header.replace(PREFIX,"");
             try {
                 username = jwtTokenUtil.getUsernameFromToken(authToken);
             } catch (IllegalArgumentException e) {
-                logger.error("Error", e);
+                logger.error("Eroare", e);
             } catch (ExpiredJwtException e) {
-                logger.warn("The token has expired", e);
+                logger.warn("Token-ul a expirat.", e);
             } catch(SignatureException e){
-                logger.error("Authentication Failed. Username or Password not valid.");
+                logger.error("Autentificare esuata. Email-ul sau parola sunt gresite.");
             }
         } else {
-            logger.warn("Couldn't find bearer string, header will be ignored");
+            logger.warn("Token-ul nu poate fi gasit");
         }
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
-            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+            UserDetails userDetails = service.loadUserByUsername(username);
 
             if (jwtTokenUtil.validateToken(authToken, userDetails)) {
                 UsernamePasswordAuthenticationToken authentication = jwtTokenUtil.getAuthenticationToken(authToken, SecurityContextHolder.getContext().getAuthentication(), userDetails);

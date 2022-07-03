@@ -15,6 +15,7 @@ import com.akhianand.springrolejwt.repository.JobsSaveRepository;
 import com.akhianand.springrolejwt.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -35,8 +36,6 @@ public class JobService {
     private final JobsSaveRepository jobsSaveRepository;
 
     private final UserRepository userRepository;
-
-    private final UserService userService;
 
     public void create(JobsSaveDto jobsDTO, String user) {
         UserEntity userEntity = userRepository.findByUsername(user);

@@ -14,6 +14,7 @@ import javassist.NotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,7 +22,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @AllArgsConstructor
-public class FavouritesController {
+public class FavoritesController {
 
     private final FavoritesRepository repository;
 
@@ -57,7 +58,8 @@ public class FavouritesController {
     @ResponseStatus(HttpStatus.OK)
     public List<JobsDTO> getAllJobsSavedForUser(@PathVariable String user){
         List<JobsEntity> collect = repository.getAllByUser(user).stream().map(favoritesEntity -> favoritesEntity.getJobsEntity()).collect(Collectors.toList());
-        return collect.stream().map(jobsEntityToJobsDTO::convert).collect(Collectors.toList());
+        List<JobsDTO> collect1 = collect.stream().map(jobsEntityToJobsDTO::convert).collect(Collectors.toList());
+        return collect1;
     }
 
     @PreAuthorize("hasRole('USER')")

@@ -10,6 +10,7 @@ import com.akhianand.springrolejwt.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,11 +26,11 @@ public class ReviewsController {
 
     private final ReviewEntityToReviewDtoMapper reviewEntityToReviewDtoMapper;
 
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping({"/reviews"})
     @ResponseStatus(HttpStatus.OK)
-    public List<ReviewsEntity> getAllReviews() {
-        return repository.findAll();
+    public List<ReviewsDTO> getAllReviews() {
+        return repository.findAll().stream().map(reviewEntityToReviewDtoMapper::convert).collect(Collectors.toList());
     }
 
     @PreAuthorize("hasRole('USER')")

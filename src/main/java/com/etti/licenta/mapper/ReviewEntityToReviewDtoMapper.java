@@ -12,7 +12,7 @@ public class ReviewEntityToReviewDtoMapper implements Converter<ReviewsEntity, R
     @Override
     public ReviewsDTO convert(ReviewsEntity source) {
         return ReviewsDTO.builder()
-                .id(source.getRating())
+                .id((int) source.getId())
                 .email(source.getEmail())
                 .message(source.getMessage())
                 .rating(source.getRating())

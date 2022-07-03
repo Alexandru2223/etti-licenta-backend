@@ -18,10 +18,13 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.transaction.Transactional;
 import javax.validation.Valid;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -67,6 +70,13 @@ public class UserController {
         return userEntityToUserDTO.convert(repository.findByUsername(user));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping
+    @ResponseStatus(HttpStatus.OK)
+    public List<UserDto> getAll(){
+        return repository.getAll().stream().map(userEntityToUserDTO::convert).collect(Collectors.toList());
+    }
+
     @PutMapping("/{user}")
     @ResponseStatus(HttpStatus.OK)
     @Transactional
@@ -77,6 +87,16 @@ public class UserController {
         userEntity.setBirthdate(userDto.getBirthdate());
         repository.save(userEntity);
     }
+
+    @DeleteMapping("/{user}")
+    @ResponseStatus(HttpStatus.OK)
+    @Transactional
+    public List<UserDto> deleteUser(@PathVariable String user){
+        UserEntity userEntity = repository.findByUsername(user);
+        repository.delete(userEntity);
+        return repository.getAll().stream().map(userEntityToUserDTO::convert).collect(Collectors.toList());
+    }
+
 
     @PreAuthorize("hasRole('ADMIN')")
     @RequestMapping(value="/adminping", method = RequestMethod.GET)

@@ -9,6 +9,7 @@ import com.akhianand.springrolejwt.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -23,6 +24,7 @@ import java.util.Set;
 @Service
 @AllArgsConstructor
 public class UserService implements UserDetailsService {
+
     private final RoleService roleService;
 
     private final BCryptPasswordEncoder bcryptEncoder;
@@ -34,10 +36,7 @@ public class UserService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         UserEntity user = repository.findByUsername(username);
-        if(user == null){
-            throw new UsernameNotFoundException("Invalid username or password.");
-        }
-        return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), getAuthority(user));
+        return new User(user.getUsername(), user.getPassword(), getAuthority(user));
     }
 
     private Set<SimpleGrantedAuthority> getAuthority(UserEntity user) {
@@ -48,26 +47,13 @@ public class UserService implements UserDetailsService {
         return authorities;
     }
 
-    public List<UserEntity> findAll() {
-        List<UserEntity> list = new ArrayList<>();
-        repository.findAll().iterator().forEachRemaining(list::add);
-        return list;
-    }
-
-    public void saveEntity(UserEntity userEntity){
-        repository.save(userEntity);
-    }
-
     public UserEntity save(UserDto user) {
 
         UserEntity nUser = userDTOToUserEntity.convert(user);
         nUser.setPassword(bcryptEncoder.encode(user.getPassword()));
-
         Role role = roleService.findByName("USER");
         Set<Role> roleSet = new HashSet<>();
         roleSet.add(role);
-
-
         nUser.setRoles(roleSet);
         return repository.save(nUser);
     }
